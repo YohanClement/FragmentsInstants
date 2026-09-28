@@ -308,8 +308,10 @@ comportement du Pomodoro et les calculs de progression utilisent bien les nouvel
   statistiques déjà calculées pour les périodes passées restent inchangées ; les tâches qui
   n'avaient que ce tag basculent automatiquement sur "Autre" (voir US4).
 - Que se passe-t-il si l'utilisatrice réinitialise un Pomodoro quelques secondes après l'avoir
-  démarré ? Le temps réellement écoulé, même très court, est tout de même enregistré comme temps
-  de focus, mais cette session interrompue n'incrémente ni le "nombre de Pomodoros" ni le
+  démarré ? Le temps réellement écoulé est tout de même enregistré en base comme une session
+  interrompue, quelle que soit sa durée ; toutefois, s'il est inférieur à une minute, il n'entre
+  pas dans le temps de focus total affiché (FR-012, règle des sessions de moins d'une minute).
+  Dans tous les cas, cette session interrompue n'incrémente ni le "nombre de Pomodoros" ni le
   compteur avant pause longue (voir US2).
 - Que se passe-t-il au changement de jour calendaire (minuit) pendant qu'un Pomodoro est en
   cours ? Le compteur de Pomodoros avant pause longue se réinitialise pour la nouvelle journée ;
