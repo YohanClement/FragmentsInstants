@@ -33,9 +33,11 @@ migrations, and computes every statistic on read from that raw data — never st
 
 **Performance Goals**: No explicit throughput targets — single local user, local SQLite; interactions (task creation, mood entry) must feel instant (<1s round trip) per SC-001/SC-004, trivially met at this scale.
 
-**Constraints**: Fully offline-capable (Local-first, constitution II); Pomodoro timer must survive OS sleep/wake via timestamp-based elapsed-time computation rather than an incremental counter; no total/statistic ever persisted (constitution III); all money-shot formulas are pure, tested Java classes (constitution IV); missing-data handling never substitutes 0 for "no entry" (constitution V); dark, botanical/féerique palette with AA contrast (constitution VI, palette in research/data-model as needed by later UI tasks).
+**Constraints**: Fully offline-capable (Local-first, constitution II); Pomodoro timer must survive OS sleep/wake via timestamp-based elapsed-time computation rather than an incremental counter, sending only raw timestamps to the API (server always computes the actual duration, never trusting a client-sent value — FR-012); no total/statistic ever persisted (constitution III); all 8 domain formulas are pure, tested Java classes (constitution IV, see data-model.md); missing-data handling never substitutes 0 for "no entry" (constitution V); dark, botanical/féerique palette with AA contrast (constitution VI, palette in research/data-model as needed by later UI tasks); every business-rule rejection across the API uses one single error code, `422 REGLE_METIER_VIOLEE` (FR-040), never a different code per rule.
 
-**Scale/Scope**: 8 user stories (all P1), ~5 backend entities, ~8 REST resource groups, ~8 frontend feature areas (tasks, Pomodoro, dashboard, tags, mood, charts, settings, shared/core) — single user, no multi-tenancy.
+**Timezone**: `Europe/Paris` (Windows timezone ID `Romance Standard Time`, UTC+1/+2 with DST) — the fixed timezone of the workstation running both processes, confirmed via `[System.TimeZoneInfo]::Local` on 2026-09-28. Every "calendar day" notion in this feature (a session's day, "today", the week used for the histogram/trend/tag-breakdown/weekly-average endpoints, the midnight reset of the long-break counter) is computed in this timezone on the backend — never UTC, never the browser's timezone — since front and back always run on the same local machine in V1. If the app is ever run on a different machine, this value must be re-verified rather than assumed.
+
+**Scale/Scope**: 8 user stories (all P1), 5 backend entities (Task, PomodoroSession, Tag, MoodEntry, Settings — see data-model.md for the `Long` vs. UUID identifier decision, pending Task 1's spike), ~8 REST resource groups, ~8 frontend feature areas (tasks, Pomodoro, dashboard, tags, mood, charts, settings, shared/core) — single user, no multi-tenancy.
 
 ## Constitution Check
 
@@ -46,7 +48,7 @@ migrations, and computes every statistic on read from that raw data — never st
 | I. Bienveillance | No streak-loss logic anywhere in scope (out of scope per spec); UI/error-message wording is a later UI-task concern, flagged in `contracts/api-overview.md`'s error shape; no red-as-alarm requirement introduced. | PASS |
 | II. Local-first | SQLite file on disk, no auth, no remote service; both processes run on localhost only. | PASS |
 | III. Données brutes d'abord | Data model stores only raw `Task`/`PomodoroSession`/`Tag`/`MoodEntry`/`Settings` rows; every statistic (progress %, tag %, focus time, weekly averages) is computed on read in `domain/`+`application/`, never persisted as a column. | PASS |
-| IV. Exactitude des calculs | All 7 formulas (weight, daily progress, remaining time, tag %, weekly mood/fatigue average, daily Pomodoro count, Pomodoros-before-long-break, focus-time total) are pure classes in `domain/`, no Spring dependency, JUnit-tested first. | PASS |
+| IV. Exactitude des calculs | All 8 formulas (weight, daily progress, remaining time, tag % — computed session by session, weekly mood/fatigue average, daily Pomodoro count, Pomodoros-before-long-break + next break type, focus-time total) are pure classes in `domain/`, no Spring dependency, JUnit-tested first. See data-model.md's numbered table. | PASS |
 | V. Gestion des données manquantes | `WeeklyMoodFatigueAverage` excludes days with no entry rather than treating them as 0; `DailyProgress` and `TagPercentageBreakdown` return 0% (not an error) on a zero denominator. | PASS |
 | VI. Direction artistique | Out of this plan's backend/data scope; will constrain the SCSS variables and component styling in later implementation tasks (not a gate failure at planning stage). | DEFERRED TO UI TASKS |
 | VII. Simplicité | Dropped the unused "variation vs previous value" formula (see research.md) rather than building speculative code; V1 scope only, no V2/V3 features (YouTube, ambiances, gamification, week comparisons, weekly recap) touched. | PASS |
@@ -128,3 +130,22 @@ the domain/application/infrastructure layering entirely inside `backend/`.
 > **Fill ONLY if Constitution Check has violations that must be justified**
 
 No violations — table intentionally left empty.
+
+## Implementation order note (binding on `/speckit-tasks`)
+
+**The first task in `tasks.md` MUST be a feasibility spike**, before any other backend task is
+built on top of an unverified stack:
+
+1. Stand up one Flyway-migrated table and read/write a row through Spring Data JPA against a real
+   SQLite file, using `hibernate-community-dialects`' `SQLiteDialect` (research.md) and the
+   `Long`/`IDENTITY` id strategy (data-model.md, "Identifier strategy").
+2. Confirm auto-increment `Long` ids work end-to-end (insert, generated-id read-back, a basic
+   query) under this dialect/driver combination — this is the explicit "vérifier UUID contre
+   identifiants entiers" check: if `IDENTITY` generation misbehaves, switch to UUID ids per the
+   documented fallback instead of proceeding on an assumption.
+3. If SQLite/Flyway/Hibernate wiring itself is unreliable (not just the id strategy), fall back
+   to an embedded H2 database (PostgreSQL-compatibility mode) as documented in data-model.md,
+   before any other entity/migration is written.
+
+Every subsequent backend task assumes this spike's outcome (SQLite+`Long` ids, SQLite+UUID ids,
+or H2 fallback) as settled fact.

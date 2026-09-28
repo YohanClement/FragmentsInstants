@@ -30,6 +30,27 @@
   continu tant que la séquence n'est pas interrompue par une pause longue ? → A: Réinitialisation
   quotidienne ; seuls les Pomodoros Focus complétés le jour même comptent pour déclencher la pause
   longue.
+- Q: La moyenne hebdomadaire d'humeur/fatigue (calculée uniquement sur les jours renseignés) doit-
+  elle être exposée dans l'interface V1, ou retirée faute d'écran dédié ? → A: Exposée sous forme
+  de cartes hebdomadaires sur le tableau de bord (une carte par échelle : humeur, fatigue physique,
+  fatigue mentale), affichant "aucune donnée" si aucun jour de la semaine en cours n'a été
+  renseigné.
+- Q: Comment définir précisément "tâche prévue aujourd'hui", utilisée à la fois par le filtre
+  "Aujourd'hui" et par le dénominateur de la progression pondérée du jour ? → A: Une tâche est
+  "prévue aujourd'hui" si elle est non terminée avec une échéance égale ou antérieure à
+  aujourd'hui (une échéance passée reste dans la journée, sans marque d'alerte ni ton punitif), OU
+  si elle a été terminée aujourd'hui, quelle que soit son échéance. Une tâche sans échéance n'est
+  jamais "prévue aujourd'hui" automatiquement, sauf si elle est terminée aujourd'hui. La même
+  définition sert au filtre "Aujourd'hui" (les tâches terminées y restant masquées par défaut,
+  comme le prévoit FR-004) et au dénominateur de la progression pondérée (FR-028).
+- Q: Comment le temps d'une session Pomodoro sans tâche associée (ou dont la tâche a été
+  supprimée) doit-il être compté dans la répartition par tag ? → A: Comptabilisé intégralement
+  sous le tag "Autre".
+- Q: La répartition du temps par tag (donut) se calcule-t-elle sur le temps total cumulé d'une
+  tâche, ou séance par séance ? → A: Séance par séance, sur la période choisie (aujourd'hui ou
+  cette semaine) : chaque session Focus de la période est répartie également entre les tags
+  courants de sa tâche associée au moment du calcul (ou affectée entièrement à "Autre" si elle n'a
+  pas de tâche associée).
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -64,6 +85,9 @@ mettant en pause et en la supprimant — sans dépendre du Pomodoro ni des stati
 6. **Given** une tâche marquée terminée, **When** l'utilisatrice annule cette complétion, **Then**
    la tâche redevient active et réapparaît dans les filtres "Toutes"/"Aujourd'hui"/"Importantes"
    le cas échéant.
+7. **Given** une tâche active dont l'échéance était hier, **When** l'utilisatrice applique le
+   filtre "Aujourd'hui", **Then** la tâche apparaît dans la liste, sans aucune marque d'alerte
+   visuelle indiquant un retard.
 
 ---
 
@@ -121,6 +145,14 @@ journée en cours, puis en vérifiant que le dashboard reflète correctement cha
    dashboard, **Then** le nombre de Pomodoros et le temps de focus cumulé du jour sont affichés.
 3. **Given** un Pomodoro actuellement en cours, **When** l'utilisatrice ouvre le dashboard,
    **Then** l'état du Pomodoro en cours (mode, tâche associée, temps restant) y est visible.
+4. **Given** deux Pomodoros Focus complétés aujourd'hui et un seuil de 4 avant pause longue,
+   **When** l'utilisatrice ouvre le dashboard, **Then** le nombre de Pomodoros restants avant la
+   pause longue (2) et le type de la prochaine pause (courte) sont affichés, calculés par le
+   serveur.
+5. **Given** des saisies humeur/fatigue sur au moins un jour de la semaine en cours, **When**
+   l'utilisatrice ouvre le dashboard, **Then** des cartes hebdomadaires affichent la moyenne
+   d'humeur, de fatigue physique et de fatigue mentale calculées uniquement sur les jours
+   renseignés ; si aucun jour de la semaine n'est renseigné, chaque carte affiche "aucune donnée".
 
 ---
 
@@ -286,6 +318,14 @@ comportement du Pomodoro et les calculs de progression utilisent bien les nouvel
 - Que se passe-t-il si l'utilisatrice tente de supprimer ou de renommer le tag "Autre" ? L'action
   est refusée : ce tag est protégé car il sert de valeur par défaut garantissant qu'aucune tâche
   n'est jamais sans tag.
+- Comment le temps d'une session Focus sans tâche associée (jamais assignée, ou associée à une
+  tâche depuis supprimée) doit-il apparaître dans la répartition par tag ? Cette session est
+  comptabilisée intégralement sous le tag "Autre", au même titre qu'une tâche sans tag
+  personnalisé (voir FR-031).
+- Que se passe-t-il pour une tâche active ou en pause dont l'échéance est déjà passée ? Elle reste
+  incluse dans le filtre "Aujourd'hui" et dans la progression pondérée du jour tant qu'elle n'est
+  pas terminée, sans aucune marque d'alerte ni ton culpabilisant (principe de Bienveillance) — voir
+  la définition de "tâche prévue aujourd'hui" en FR-006.
 
 ## Requirements *(mandatory)*
 
@@ -304,7 +344,14 @@ comportement du Pomodoro et les calculs de progression utilisent bien les nouvel
 - **FR-032**: Le système DOIT permettre d'annuler la complétion d'une tâche déjà marquée
   terminée, en la remettant au statut actif.
 - **FR-006**: Le système DOIT permettre de filtrer les tâches par : Toutes, Aujourd'hui,
-  Importantes, Terminées.
+  Importantes, Terminées. Une tâche est considérée **"prévue aujourd'hui"** si elle n'est pas
+  terminée et que son échéance est égale ou antérieure à la date du jour (une échéance passée
+  reste incluse dans "aujourd'hui", affichée sans marque d'alerte ni ton punitif — principe de
+  Bienveillance), OU si elle a été terminée aujourd'hui, quelle que soit son échéance ; une tâche
+  sans échéance n'est jamais "prévue aujourd'hui" de ce seul fait, sauf si elle est terminée
+  aujourd'hui. Cette définition sert à la fois de base au filtre "Aujourd'hui" (les tâches
+  terminées y restant masquées par défaut, comme le prévoit FR-004) et au dénominateur de la
+  progression pondérée du jour (FR-028).
 - **FR-007**: Le filtre "Importantes" DOIT inclure les tâches de priorité haute ou critique.
 - **FR-008**: Pour chaque tâche, le système DOIT afficher séparément la durée estimée, le temps
   réel passé et le temps restant.
@@ -319,7 +366,9 @@ comportement du Pomodoro et les calculs de progression utilisent bien les nouvel
 - **FR-011**: Le système DOIT permettre d'associer une session Pomodoro à une tâche.
 - **FR-012**: Le système DOIT enregistrer le temps réellement écoulé d'une session Pomodoro même
   si celle-ci est interrompue avant son terme (pause prolongée, réinitialisation, fermeture de
-  l'application).
+  l'application). Cette durée DOIT être calculée par le serveur à partir des horodatages de début
+  et de fin transmis par le front (jamais à partir d'une valeur de durée envoyée directement par
+  le front), afin de garantir une source unique de vérité.
 - **FR-033**: Le système DOIT distinguer une session Pomodoro menée à son terme d'une session
   interrompue ; seules les sessions Focus menées à leur terme DOIVENT incrémenter le "nombre de
   Pomodoros" et le compteur de Pomodoros avant pause longue, même si le temps d'une session
@@ -327,14 +376,29 @@ comportement du Pomodoro et les calculs de progression utilisent bien les nouvel
 - **FR-037**: Le système DOIT réinitialiser le compteur de Pomodoros avant pause longue à chaque
   nouveau jour calendaire, de sorte que seuls les Pomodoros Focus complétés le jour même comptent
   pour déclencher la pause longue.
+- **FR-038**: Le système DOIT calculer côté serveur, à partir du nombre de Pomodoros Focus
+  terminés aujourd'hui et du seuil configuré (FR-025), le nombre de Pomodoros restants avant la
+  prochaine pause longue ainsi que le type (courte ou longue) de la prochaine pause, et DOIT les
+  exposer sur le tableau de bord (FR-013), afin qu'aucun de ces deux calculs ne soit dupliqué côté
+  front.
+- **FR-039**: Le système DOIT calculer et exposer sur le tableau de bord des moyennes
+  hebdomadaires d'humeur, de fatigue physique et de fatigue mentale portant sur les jours
+  renseignés de la semaine en cours (au sens de FR-030), affichées sous forme de cartes, avec
+  "aucune donnée" lorsque aucun jour de la semaine n'a été renseigné.
+- **FR-040**: Le système DOIT rejeter toute action contraire aux règles métier (renommage ou
+  suppression du tag protégé, note humeur/fatigue hors de l'intervalle 1-7, etc.) au moyen d'un
+  code d'erreur métier unique et cohérent sur l'ensemble de l'API, accompagné d'un message
+  explicite et bienveillant (principe de Bienveillance), plutôt que d'un code différent par règle.
 
 **Tableau de bord**
 
 - **FR-013**: Le système DOIT fournir un tableau de bord journalier affichant : le Pomodoro en
   cours (le cas échéant), les tâches du jour, la progression pondérée du jour, le temps de focus
-  cumulé du jour, le nombre de tâches terminées aujourd'hui et le nombre de Pomodoros Focus menés
+  cumulé du jour, le nombre de tâches terminées aujourd'hui, le nombre de Pomodoros Focus menés
   à leur terme aujourd'hui (les sessions interrompues ne sont pas comptées dans ce nombre, voir
-  FR-033).
+  FR-033), le nombre de Pomodoros restants avant la prochaine pause longue et le type de la
+  prochaine pause (FR-038), ainsi que les moyennes hebdomadaires d'humeur et de fatigue sur les
+  jours renseignés de la semaine en cours (FR-039).
 
 **Tags**
 
@@ -399,9 +463,13 @@ comportement du Pomodoro et les calculs de progression utilisent bien les nouvel
   temps réel).
 - **FR-030**: Le système DOIT calculer les moyennes hebdomadaires d'humeur et de fatigue en
   n'utilisant que les jours ayant une entrée enregistrée, à l'exclusion des jours sans saisie.
-- **FR-031**: Le système DOIT calculer le pourcentage de temps par tag comme (temps enregistré
-  pour ce tag ÷ temps total enregistré pour la période) × 100, et DOIT afficher 0 % — sans erreur
-  — lorsque le temps total enregistré est nul.
+- **FR-031**: Le système DOIT calculer, pour chaque période demandée (aujourd'hui ou cette
+  semaine), le temps alloué à un tag en agrégeant **séance par séance** : chaque session Focus de
+  la période est répartie également entre les tags courants de sa tâche associée, ou affectée
+  intégralement au tag "Autre" si elle n'a pas de tâche associée (jamais assignée, ou tâche
+  depuis supprimée) — jamais à partir du temps total cumulé d'une tâche. Le pourcentage par tag
+  DOIT ensuite être calculé comme (temps alloué à ce tag ÷ temps total alloué sur la période) ×
+  100, et DOIT afficher 0 % — sans erreur — lorsque le temps total alloué est nul.
 
 ### Key Entities
 
@@ -410,7 +478,9 @@ comportement du Pomodoro et les calculs de progression utilisent bien les nouvel
   prévue/échéance facultative, statut (active, en pause, terminée — la complétion est réversible),
   temps réel et temps restant (dérivés des sessions Pomodoro associées).
 - **Session Pomodoro**: mode (Focus, Pause courte, Pause longue), tâche associée (facultative pour
-  les pauses), durée réellement écoulée, indicateur d'achèvement (terminée normalement ou
+  les pauses ; une session Focus sans tâche associée compte sous le tag "Autre" dans la
+  répartition par tag), horodatages de début et de fin, durée réellement écoulée (calculée par le
+  serveur à partir de ces horodatages), indicateur d'achèvement (terminée normalement ou
   interrompue — seules les sessions Focus terminées normalement comptent dans le "nombre de
   Pomodoros" et le compteur avant pause longue).
 - **Tag**: nom, origine (par défaut ou personnalisé), indicateur de protection ("Autre" est le
@@ -439,7 +509,9 @@ comportement du Pomodoro et les calculs de progression utilisent bien les nouvel
   sessions, saisies humeur/fatigue et paramètres précédemment enregistrés sont toujours présents,
   sans étape de connexion.
 - **SC-007**: Depuis le seul tableau de bord, une utilisatrice peut connaître le nombre de
-  Pomodoros complétés et le temps de focus cumulé du jour, sans naviguer vers un autre écran.
+  Pomodoros complétés, le temps de focus cumulé du jour, et le nombre de Pomodoros restants avant
+  la prochaine pause longue (calculé côté serveur), sans naviguer vers un autre écran ni effectuer
+  de calcul elle-même.
 - **SC-008**: La somme des pourcentages du donut de répartition par tag, pour une période donnée,
   totalise 100 % (à l'arrondi près) dès qu'au moins une minute de temps a été enregistrée sur
   cette période.
@@ -460,3 +532,6 @@ comportement du Pomodoro et les calculs de progression utilisent bien les nouvel
 - Hors périmètre V1 (explicitement exclu par la demande) : intégration YouTube, ambiances
   sonores, mécaniques de gamification, comparaisons entre semaines, et bilan hebdomadaire détaillé
   — ces éléments pourront être considérés pour une V2/V3.
+- Toute notion de "jour calendaire" (rattachement d'une session à son jour, réinitialisation
+  quotidienne du compteur de Pomodoros, moyennes hebdomadaires) s'entend dans le fuseau horaire
+  fixe du poste de l'utilisatrice ; voir [plan.md](./plan.md) pour la valeur retenue.

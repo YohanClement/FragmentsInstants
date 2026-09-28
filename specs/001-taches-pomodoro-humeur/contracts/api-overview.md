@@ -34,7 +34,7 @@ defined in `data-model.md` (0%, or an explicit "no data" marker for mood/fatigue
 
 | Method | Path | Purpose |
 |---|---|---|
-| POST | `/pomodoro-sessions` | Submit one finished/interrupted session (FR-012). Body: mode, taskId (optional), startedAt, endedAt, completionStatus. Server computes/validates `actualDurationSeconds = endedAt - startedAt`. Never called while a timer is running — the front end owns the live countdown via timestamps. |
+| POST | `/pomodoro-sessions` | Submit one finished/interrupted session (FR-012). Request body: `mode`, `taskId` (optional), `startedAt`, `endedAt`, `completionStatus` — **no `actualDurationSeconds` field**; the server always computes and stores it as `endedAt - startedAt` (data-model.md), never trusting a client-supplied duration. Never called while a timer is running — the front end owns the live countdown via timestamps. |
 | GET | `/pomodoro-sessions?date=YYYY-MM-DD` | List a day's sessions (used by the dashboard/debugging; day = `startedAt` date, per spec decision). |
 
 ## Tags
@@ -43,8 +43,8 @@ defined in `data-model.md` (0%, or an explicit "no data" marker for mood/fatigue
 |---|---|---|
 | GET | `/tags` | List all tags (default + custom), with `isDefault`/`isProtected` flags. |
 | POST | `/tags` | Create a custom tag (FR-015). |
-| PUT | `/tags/{id}` | Rename a tag; 409/422 if the tag is protected (FR-036). |
-| DELETE | `/tags/{id}` | Delete a custom tag; 409/422 if protected; reassigns orphaned tasks to `Autre` (FR-036). |
+| PUT | `/tags/{id}` | Rename a tag; `422 REGLE_METIER_VIOLEE` if the tag is protected (FR-036, FR-040). |
+| DELETE | `/tags/{id}` | Delete a custom tag; `422 REGLE_METIER_VIOLEE` if protected; reassigns orphaned tasks to `Autre` (FR-036). |
 
 ## Mood / fatigue
 
@@ -58,13 +58,13 @@ defined in `data-model.md` (0%, or an explicit "no data" marker for mood/fatigue
 
 | Method | Path | Purpose |
 |---|---|---|
-| GET | `/dashboard/today` | Aggregate for FR-013: today's tasks, weighted progress % (FR-028), cumulative focus time (FocusTimeTotal), completed-today count, Pomodoros-completed-today count (PomodoroDailyCount). Computed on read from raw sessions/tasks — nothing here is stored. |
+| GET | `/dashboard/today` | Aggregate for FR-013: today's tasks, weighted progress % (FR-028), cumulative focus time (FocusTimeTotal), completed-today count, Pomodoros-completed-today count (PomodoroDailyCount), `pomodorosRemainingBeforeLongBreak` + `nextBreakType` (`COURTE`\|`LONGUE`) computed by `PomodorosBeforeLongBreak` (FR-038 — the front never derives these itself), and `weeklyMoodFatigueAverages` (mood/physical fatigue/mental fatigue, each either a number or `null` for "no data" — FR-039, `WeeklyMoodFatigueAverage`). Computed on read from raw sessions/tasks/mood entries — nothing here is stored. |
 
 ## Statistics / visualizations
 
 | Method | Path | Purpose |
 |---|---|---|
-| GET | `/stats/tag-breakdown?period=today\|week` | Donut data: percentage per tag (FR-020, FR-031), always summing to 100% once ≥1 minute is recorded (SC-008). |
+| GET | `/stats/tag-breakdown?period=today\|week` | Donut data: percentage per tag, computed session by session over the period — each eligible Focus session's duration is split across its task's current tags, or attributed entirely to `Autre` if it has no task (FR-031). Always sums to 100% once ≥1 minute is recorded (SC-008). |
 | GET | `/stats/weekly-focus` | Monday→Sunday focus-time histogram for the current week, including 0-value days (FR-021). |
 | GET | `/stats/mood-fatigue-trend?from=&to=` | Three independent series (mood, physical fatigue, mental fatigue) for the requested range (FR-022); front end handles per-series show/hide. |
 | GET | `/stats/completed-tasks-by-day?from=&to=` | Count of tasks completed per day (FR-023), keyed by `completedAt` date. |
@@ -78,6 +78,12 @@ defined in `data-model.md` (0%, or an explicit "no data" marker for mood/fatigue
 
 ## Error shape
 
-All validation/business-rule rejections (e.g., renaming `Autre`, an out-of-range mood score)
-return a `400`/`409` with a body of `{ "error": string, "message": string }`. Bienveillance
-(constitution I) applies to `message` wording even in error paths — no blaming language.
+Two distinct cases, not mixed (FR-040):
+
+- **Request validation** (missing required field, malformed JSON, wrong type): standard Spring
+  `400 Bad Request` with the default validation error body.
+- **Business-rule rejection** (renaming/deleting the protected `Autre` tag, an out-of-range mood
+  score, an invalid task/session state transition, etc.): always `422 Unprocessable Entity` with
+  body `{ "code": "REGLE_METIER_VIOLEE", "message": string }` — **one single code for every
+  business rule in the API**, never a different code per rule. `message` carries the
+  rule-specific, bienveillant explanation (constitution I) — no blaming language.
