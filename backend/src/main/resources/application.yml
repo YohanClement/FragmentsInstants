@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:sqlite:data/fragments-instants.db
+    url: jdbc:sqlite:data/fragments-instants.db?foreign_keys=on
   jpa:
     hibernate:
       ddl-auto: validate
