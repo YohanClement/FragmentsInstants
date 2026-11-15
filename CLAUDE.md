@@ -39,9 +39,22 @@ read them before answering questions about the design:
   of truth for "what to build next."** The user works through it manually, in order; don't
   reorder phases without checking the Dependencies section first.
 
-**Current state**: the Angular app at the repo root is still the unmodified `ng new` scaffold (no
-feature code yet). The `backend/` Spring Boot module does not exist yet — `tasks.md` T001 creates
-it. If you're picking up mid-implementation, check `tasks.md` checkboxes and `git log`/`git status`
+**Current state** (as of 2026-11-15; `tasks.md` checkboxes are the source of truth):
+
+- Done: **T001** (feasibility spike — SQLite + Flyway + Hibernate with `Long`/`IDENTITY` ids
+  validated, 9 backend tests pass), **T002** (chart dependencies), **T003** (Angular environment
+  files), **T005** (`V1__init_schema.sql`, all tables). **T004** is marked not applicable
+  (`HttpClient` is provided by default since Angular 21).
+- Next: **T006** (`V2__seed_default_tags.sql`), then T007 and the entities (T008+).
+- The `backend/` Spring Boot module exists. It still contains the throwaway spike files
+  (`V0__spike.sql`, `SpikeItem`, `SpikeItemRepository`, `SpikeRepositoryTest`), to be deleted once
+  T005–T017 have landed with the real schema.
+- No Angular feature code yet beyond the `ng new` scaffold and the environment files.
+- Differences from `tasks.md` T001 text: `pom.xml` uses `spring-boot-starter-webmvc` (Boot 4
+  naming) and `flyway-database-nc-sqlite` 12.4.0 (not 13.0.0); springdoc is commented out, so
+  Swagger UI is not available yet.
+
+If you're picking up mid-implementation, check `tasks.md` checkboxes and `git log`/`git status`
 against the plan before assuming what exists.
 
 ## Architecture (per plan.md — target state)
@@ -97,7 +110,7 @@ CLI args pass through after `--`).
 Formatting: Prettier is configured (`.prettierrc`: 100-char width, single quotes, Angular parser
 for `*.html`) — run via `npx prettier --write .`.
 
-### Backend (once `backend/` exists, from `backend/`)
+### Backend (from `backend/`; on Windows use `./mvnw.cmd`)
 
 ```bash
 ./mvnw spring-boot:run       # runs at http://localhost:8080, Flyway migrates on startup
@@ -105,7 +118,8 @@ for `*.html`) — run via `npx prettier --write .`.
 ./mvnw test -Dtest=TaskWeightTest   # single test class
 ```
 
-Swagger UI: `http://localhost:8080/swagger-ui.html`.
+Swagger UI (`http://localhost:8080/swagger-ui.html`) is only available once the springdoc
+dependency, currently commented out in `pom.xml`, is re-enabled.
 
 ### Full-stack validation
 
@@ -124,9 +138,8 @@ exact acceptance criteria in `spec.md`.
   read the task text itself rather than re-deriving requirements from `spec.md` each time, but
   check `contracts/api-overview.md` for the exact endpoint shape before discussing a controller.
 - **IDs**: entities use `Long`/`IDENTITY` auto-increment (not UUID) per `data-model.md`'s
-  "Identifier strategy". **This decision is still pending validation by tasks.md's T001
-  feasibility spike** (SQLite + Flyway + Hibernate), which also documents the H2 fallback
-  conditions. Don't treat the id strategy or the SQLite choice as settled until T001 is done and
-  its outcome recorded.
+  "Identifier strategy". **Validated by tasks.md's T001 feasibility spike** (SQLite + Flyway +
+  Hibernate): `IDENTITY` ids work under the community SQLite dialect, so neither the UUID nor the
+  H2 fallback is needed.
 - TypeScript is strict (see `tsconfig.json`); Angular components are standalone with signals, no
   NgModules.
