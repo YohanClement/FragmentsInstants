@@ -58,9 +58,9 @@ CREATE TABLE settings(
     short_break_duration_minutes INTEGER NOT NULL CHECK (short_break_duration_minutes > 0),
     long_break_duration_minutes INTEGER NOT NULL CHECK (long_break_duration_minutes > 0),
     pomodoros_before_long_break INTEGER NOT NULL CHECK (pomodoros_before_long_break > 0),
-    priority_coefficient_low DECIMAL(4,2) NOT NULL CHECK (priority_coefficient_low > 0),
-    priority_coefficient_normal DECIMAL(4,2) NOT NULL CHECK (priority_coefficient_normal > 0),
-    priority_coefficient_high DECIMAL(4,2) NOT NULL CHECK (priority_coefficient_high > 0),
-    priority_coefficient_critical DECIMAL(4,2) NOT NULL CHECK (priority_coefficient_critical > 0),
+    priority_coefficient_low NUMERIC(4,2) NOT NULL CHECK (priority_coefficient_low > 0),
+    priority_coefficient_normal NUMERIC(4,2) NOT NULL CHECK (priority_coefficient_normal > 0),
+    priority_coefficient_high NUMERIC(4,2) NOT NULL CHECK (priority_coefficient_high > 0),
+    priority_coefficient_critical NUMERIC(4,2) NOT NULL CHECK (priority_coefficient_critical > 0),
     sound_notifications_enabled BOOLEAN NOT NULL
 );
