@@ -28,7 +28,6 @@ import jakarta.persistence.JoinColumn;
 
 @Entity @Table (name = "tasks")
 public class TaskEntity {
-
     @Id
     @GeneratedValue (strategy = GenerationType.IDENTITY)
     @JdbcTypeCode (SqlTypes.INTEGER)

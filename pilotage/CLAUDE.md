@@ -46,7 +46,7 @@ read them before answering questions about the design:
   files), **T005** (`V1__init_schema.sql`, all tables), **T006** (`V2__seed_default_tags.sql`),
   **T007** (`V3__seed_default_settings.sql`). **T004** is marked not applicable (`HttpClient` is
   provided by default since Angular 21).
-- Next: the remaining JPA entities and repositories (T009, T011–T017; **T008** `TaskEntity` and **T010** `TagEntity` are done), then `application.yml` (T018).
+- Next: `SettingsEntity` (T012) and the repositories (T013–T017; entities T008–T011 are done), then `application.yml` (T018).
 - The `backend/` Spring Boot module exists. It still contains the throwaway spike files
   (`V0__spike.sql`, `SpikeItem`, `SpikeItemRepository`, `SpikeRepositoryTest`), to be deleted once
   T005–T017 have landed with the real schema.
