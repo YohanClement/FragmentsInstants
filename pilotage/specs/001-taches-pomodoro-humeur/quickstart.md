@@ -6,7 +6,7 @@
 
 - Java 21 (`java -version`)
 - Maven 3.9+ (or use the generated `backend/mvnw`)
-- Node.js >= 22.22.3 (Angular CLI 22 requirement) — already satisfies the root `package.json`
+- Node.js >= 22.22.3 (Angular CLI 22 requirement) — already satisfies `frontend/package.json`
 - No external services, no accounts: everything runs locally.
 
 ## 1. Start the backend
@@ -25,9 +25,10 @@ cd backend
 
 ## 2. Start the frontend
 
-From the repository root (already scaffolded Angular app):
+From `frontend/` (the Angular app):
 
 ```bash
+cd frontend
 npm install   # first time only
 ng serve
 ```

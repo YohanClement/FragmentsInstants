@@ -53,7 +53,7 @@ approved spec. No `NEEDS CLARIFICATION` markers remain after this phase.
 | Hibernate SQLite dialect | `org.hibernate.orm:hibernate-community-dialects` (version = Hibernate ORM version bundled with Spring Boot 4.1.1) → `org.hibernate.community.dialect.SQLiteDialect` | Hibernate has no official SQLite dialect in `hibernate-core`; the community dialects module is required and is best-effort maintained (documented risk, acceptable for a local single-user app). |
 | springdoc-openapi | `springdoc-openapi-starter-webmvc-ui:3.1.1` | Explicitly supports Spring Boot 3.x and 4.x with Java 21+ and OpenAPI 3.1. |
 | JUnit 5 + AssertJ | Managed by `spring-boot-starter-test` in the 4.1.1 BOM | No explicit version pin needed. |
-| Angular | 22.2.0 | **Already scaffolded in this repository at the project root** (`package.json`, `angular.json`); matches "latest stable" at research time (Angular 22, stable since 2026-06-03). |
+| Angular | 22.2.0 | **Already scaffolded in this repository, now in `frontend/`** (`package.json`, `angular.json`); matches "latest stable" at research time (Angular 22, stable since 2026-06-03). |
 | TypeScript | ~6.0.2 (already pinned in the scaffold) | Angular 22 requires TypeScript >=6.0 <6.1; strict mode already the project default. |
 | ng2-charts | 10.0.0 | Peer dependencies: `@angular/core` etc. `>=21.0.0`, `chart.js` `^3.4.0 || ^4.0.0`, `rxjs` `^6.5.3 || ^7.4.0` — compatible with the scaffolded Angular 22.2.0 / RxJS 7.8. |
 | chart.js | ^4.x (latest 4.x) | Peer dependency of ng2-charts 10.0.0; version 4 chosen over 3 as the actively developed major. |
@@ -63,6 +63,9 @@ approved spec. No `NEEDS CLARIFICATION` markers remain after this phase.
 ## Other decisions
 
 ### Decision: SSR scaffold present but unused for this feature
+
+> **Update**: SSR was later removed from the scaffold (commit `c842e80`, "suppression du SSR"). The
+> paragraph below is kept as the original decision record.
 
 - **Rationale**: The existing Angular scaffold at the repository root was generated with SSR
   (Express server, `platform-server`, `src/server.ts`, `outputMode: server`). Les Fragments
@@ -75,7 +78,11 @@ approved spec. No `NEEDS CLARIFICATION` markers remain after this phase.
   feature's plan; it is a pre-existing project-setup concern, not part of this feature's
   requirements.
 
-### Decision: Backend lives in a new `backend/` directory; Angular stays at repository root
+### Decision: Backend lives in a new `backend/` directory; Angular lives in `frontend/`
+
+> **Update (2026-11-15)**: this decision was reversed. The Angular app was moved from the
+> repository root to `frontend/`, and `specs/`, `.specify/`, `.claude/` and `CLAUDE.md` to
+> `pilotage/`. The original rationale below is kept as a record.
 
 - **Rationale**: The Angular application is already scaffolded at the repository root (not under
   a `frontend/` folder). Moving it would be unnecessary churn. The Spring Boot backend is added as

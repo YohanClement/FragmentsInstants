@@ -11,15 +11,15 @@
 Local, single-user personal productivity app ("Les Fragments d'Instants") combining task
 management, a Pomodoro timer, a daily dashboard, tag-based organization, mood/fatigue tracking,
 and visualizations — all data local-only, no account. Technical approach: a two-process
-client-server architecture running entirely on the user's machine — an Angular 22 SPA (already
-scaffolded at the repository root) driving a local-only Pomodoro timer via timestamps, talking
+client-server architecture running entirely on the user's machine — an Angular 22 SPA (in
+`frontend/`) driving a local-only Pomodoro timer via timestamps, talking
 over CORS-enabled REST to a layered Spring Boot 4.1.1 backend (domain/application/infrastructure)
 that persists raw tasks, sessions, tags, and mood entries to a local SQLite file via Flyway
 migrations, and computes every statistic on read from that raw data — never storing a total.
 
 ## Technical Context
 
-**Language/Version**: Java 21 (backend); TypeScript ~6.0.2 strict (frontend, Angular 22.2.0 — already scaffolded)
+**Language/Version**: Java 21 (backend); TypeScript ~6.0.2 strict (frontend, Angular 22.2.0 — scaffolded in `frontend/`)
 
 **Primary Dependencies**: Spring Boot 4.1.1, Spring Data JPA, Flyway (`flyway-core` + `flyway-database-nc-sqlite`), `sqlite-jdbc`, `hibernate-community-dialects` (SQLite dialect), `springdoc-openapi-starter-webmvc-ui` 3.1.1, JUnit 5 + AssertJ (via `spring-boot-starter-test`) — backend. Angular 22 standalone components + signals, RxJS 7.8, `ng2-charts` 10.0.0 + `chart.js` 4.x, Vitest (Angular's default test runner) — frontend. See [research.md](./research.md) for verified versions and rationale.
 
@@ -60,7 +60,7 @@ No violations requiring justification. Complexity Tracking table below is empty.
 ### Documentation (this feature)
 
 ```text
-specs/001-taches-pomodoro-humeur/
+pilotage/specs/001-taches-pomodoro-humeur/
 ├── plan.md              # This file (/speckit-plan command output)
 ├── research.md          # Phase 0 output (/speckit-plan command)
 ├── data-model.md         # Phase 1 output (/speckit-plan command)
@@ -70,12 +70,13 @@ specs/001-taches-pomodoro-humeur/
 └── tasks.md             # Phase 2 output (/speckit-tasks command - NOT created by /speckit-plan)
 ```
 
-### Source Code (repository root)
+### Source Code (repository root: `frontend/`, `backend/`, `pilotage/`)
 
 ```text
-# Frontend: Angular 22 SPA, already scaffolded at the repository root (package.json, angular.json,
-# src/ present before this feature). This feature adds feature folders under src/app/.
-src/
+# Frontend: Angular 22 SPA in frontend/ (package.json, angular.json, src/ present before this
+# feature; moved from the repository root to frontend/ on 2026-11-15). This feature adds feature
+# folders under frontend/src/app/.
+frontend/src/
 ├── app/
 │   ├── core/                 # HTTP services (TasksApi, PomodoroApi, TagsApi, MoodApi,
 │   │                          # DashboardApi, StatsApi, SettingsApi), shared models/DTOs
@@ -92,7 +93,7 @@ src/
 ├── styles.scss                # Extended with CSS custom properties for the imposed palette
 └── main.ts
 
-# Backend: new Spring Boot 4.1.1 app in its own Maven module, sibling to the Angular root.
+# Backend: new Spring Boot 4.1.1 app in its own Maven module, sibling to frontend/.
 backend/
 ├── pom.xml
 ├── mvnw / mvnw.cmd
@@ -116,10 +117,10 @@ backend/
 └── data/                      # SQLite file at runtime (gitignored)
 ```
 
-**Structure Decision**: Two sibling toolchains in one repository: the Angular SPA stays at the
-repository root, where it was already scaffolded (`package.json`, `angular.json`, `src/`
-pre-existed this feature) — relocating it under a generic `frontend/` folder would be unrelated
-churn. The new Spring Boot backend is added as an independent Maven module under `backend/`, so
+**Structure Decision**: Two sibling toolchains in one repository, plus a steering folder. The
+Angular SPA lives in `frontend/` (originally scaffolded at the repository root, then moved on
+2026-11-15 to mirror `backend/`), and `pilotage/` holds `specs/`, `.specify/`, `.claude/` and
+`CLAUDE.md`. The new Spring Boot backend is added as an independent Maven module under `backend/`, so
 each side keeps its own build tool, dependency manager, and test runner while communicating only
 over the documented REST contract (`contracts/api-overview.md`) with CORS restricted to the
 local dev origin. This matches the user's explicit two-process client-server request and keeps
