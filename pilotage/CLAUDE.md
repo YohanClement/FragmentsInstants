@@ -43,9 +43,10 @@ read them before answering questions about the design:
 
 - Done: **T001** (feasibility spike — SQLite + Flyway + Hibernate with `Long`/`IDENTITY` ids
   validated, 9 backend tests pass), **T002** (chart dependencies), **T003** (Angular environment
-  files), **T005** (`V1__init_schema.sql`, all tables). **T004** is marked not applicable
-  (`HttpClient` is provided by default since Angular 21).
-- Next: **T006** (`V2__seed_default_tags.sql`), then T007 and the entities (T008+).
+  files), **T005** (`V1__init_schema.sql`, all tables), **T006** (`V2__seed_default_tags.sql`),
+  **T007** (`V3__seed_default_settings.sql`). **T004** is marked not applicable (`HttpClient` is
+  provided by default since Angular 21).
+- Next: the JPA entities and repositories (T008–T017), then `application.yml` (T018).
 - The `backend/` Spring Boot module exists. It still contains the throwaway spike files
   (`V0__spike.sql`, `SpikeItem`, `SpikeItemRepository`, `SpikeRepositoryTest`), to be deleted once
   T005–T017 have landed with the real schema.
