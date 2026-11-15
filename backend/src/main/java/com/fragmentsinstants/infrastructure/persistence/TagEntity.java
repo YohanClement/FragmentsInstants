@@ -15,7 +15,7 @@ public class TagEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JdbcTypeCode(SqlTypes.INTEGER)
-    private Long Id;
+    private Long id;
 
     @Column(name = "name", nullable = false, length = 100)
     private String name;
@@ -26,12 +26,12 @@ public class TagEntity {
     @Column (name = "is_protected", nullable = false)
     private boolean isProtected;
 
-    public Long getTagId() {
-        return Id;
+    public Long getId() {
+        return id;
     }
 
-    public void setTagId(Long Id) {
-        this.Id = Id;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getName() {
