@@ -39,14 +39,31 @@ read them before answering questions about the design:
   of truth for "what to build next."** The user works through it manually, in order; don't
   reorder phases without checking the Dependencies section first.
 
+**Where we stopped (2026-11-15, end of session)**: all JPA entities are written, validated against
+the schema and pushed (T008–T012; 9 backend tests pass). **Resume at T015 `TagRepository`**
+(simplest: `findByNameIgnoreCase` + CRUD), then T013, T014, T016, T017, then T018 (`application.yml`)
+and T019 (error handling). The repositories allow the first real read/write tests on the entities.
+
+Open points to revisit (not blockers):
+- `PomodoroSessionEntity` (T009): FR-012 says `actualDurationSeconds` must be server-computed with
+  no public setter reachable from outside the entity/service layer. Not re-reviewed after the
+  `Long`→`Integer` and `@ManyToOne` fixes; check it before the session service.
+- `backend/data/` no longer exists on a fresh clone (the `.db` is now gitignored): add
+  `backend/data/.gitkeep` or have the app create the folder (T018).
+- Validation ranges (`@Min`/`@Max`/`@Positive`) belong on the request DTOs, not on entities.
+- The root `README.md` still describes the Angular CLI commands; move it into `frontend/` or rewrite it.
+- SQLite stores `NUMERIC(4,2)` as a float; `BigDecimal` stays the Java type for exact calculations.
+- Editing `V1` changes its Flyway checksum: delete `backend/data/fragments-instants.db` (and
+  disconnect DBeaver first) if a migration is edited after being applied.
+
 **Current state** (as of 2026-11-15; `tasks.md` checkboxes are the source of truth):
 
 - Done: **T001** (feasibility spike — SQLite + Flyway + Hibernate with `Long`/`IDENTITY` ids
   validated, 9 backend tests pass), **T002** (chart dependencies), **T003** (Angular environment
   files), **T005** (`V1__init_schema.sql`, all tables), **T006** (`V2__seed_default_tags.sql`),
-  **T007** (`V3__seed_default_settings.sql`). **T004** is marked not applicable (`HttpClient` is
-  provided by default since Angular 21).
-- Next: the repositories (T013–T017; all entities T008–T012 are done), then `application.yml` (T018).
+  **T007** (`V3__seed_default_settings.sql`), **T008–T012** (all JPA entities). **T004** is marked
+  not applicable (`HttpClient` is provided by default since Angular 21).
+- Next: the repositories (T013–T017), then `application.yml` (T018).
 - The `backend/` Spring Boot module exists. It still contains the throwaway spike files
   (`V0__spike.sql`, `SpikeItem`, `SpikeItemRepository`, `SpikeRepositoryTest`), to be deleted once
   T005–T017 have landed with the real schema.
