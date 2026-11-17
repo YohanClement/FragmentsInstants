@@ -39,10 +39,9 @@ read them before answering questions about the design:
   of truth for "what to build next."** The user works through it manually, in order; don't
   reorder phases without checking the Dependencies section first.
 
-**Where we stopped (2026-11-15, end of session)**: all JPA entities are written, validated against
-the schema and pushed (T008–T012; 9 backend tests pass). **Resume at T015 `TagRepository`**
-(simplest: `findByNameIgnoreCase` + CRUD), then T013, T014, T016, T017, then T018 (`application.yml`)
-and T019 (error handling). The repositories allow the first real read/write tests on the entities.
+**Where we stopped (2026-11-17)**: all JPA entities are written (T008–T012) and T015
+`TagRepository` is done with 4 `@DataJpaTest` tests (`TagRepositoryTest`). **Resume at T013
+`TaskRepository`**, then T014, T016, T017, then T018 (`application.yml`) and T019 (error handling).
 
 Open points to revisit (not blockers):
 - `PomodoroSessionEntity` (T009): FR-012 says `actualDurationSeconds` must be server-computed with
@@ -52,6 +51,10 @@ Open points to revisit (not blockers):
   `backend/data/.gitkeep` or have the app create the folder (T018).
 - Validation ranges (`@Min`/`@Max`/`@Positive`) belong on the request DTOs, not on entities.
 - The root `README.md` still describes the Angular CLI commands; move it into `frontend/` or rewrite it.
+- Case-insensitive tag uniqueness does not cover accented letters under SQLite: `upper()` and
+  `COLLATE NOCASE` only fold A–Z, so `findByNameIgnoreCase("écriture")` does not find `Écriture`
+  (documented by `TagRepositoryTest`). Handle it in the tag service (e.g. Java
+  `equalsIgnoreCase`) in T061 `TagService`, with a case in T059.
 - SQLite stores `NUMERIC(4,2)` as a float; `BigDecimal` stays the Java type for exact calculations.
 - Editing `V1` changes its Flyway checksum: delete `backend/data/fragments-instants.db` (and
   disconnect DBeaver first) if a migration is edited after being applied.
