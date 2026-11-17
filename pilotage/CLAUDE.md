@@ -39,9 +39,11 @@ read them before answering questions about the design:
   of truth for "what to build next."** The user works through it manually, in order; don't
   reorder phases without checking the Dependencies section first.
 
-**Where we stopped (2026-11-17)**: all JPA entities are written (T008–T012) and T015
-`TagRepository` is done with 4 `@DataJpaTest` tests (`TagRepositoryTest`). **Resume at T013
-`TaskRepository`**, then T014, T016, T017, then T018 (`application.yml`) and T019 (error handling).
+**Where we stopped (2026-11-17)**: all JPA entities are written (T008–T012); T015
+`TagRepository` and T013 `TaskRepository` are done with `@DataJpaTest` tests (16 backend tests
+pass). `TaskRepository` keeps a few extra query methods commented out (not required by T013,
+untested); revive them only when a service needs one. **Resume at T014
+`PomodoroSessionRepository`**, then T016, T017, then T018 (`application.yml`) and T019 (error handling).
 
 Open points to revisit (not blockers):
 - `PomodoroSessionEntity` (T009): FR-012 says `actualDurationSeconds` must be server-computed with
