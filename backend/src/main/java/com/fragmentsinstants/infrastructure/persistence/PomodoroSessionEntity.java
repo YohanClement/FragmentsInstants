@@ -33,7 +33,7 @@ public class PomodoroSessionEntity {
 
     @ManyToOne 
     @JoinColumn (name = "task_id")
-    private TaskEntity taskId;
+    private TaskEntity task;
 
     @Column (name = "started_at", nullable = false)
     private Instant startedAt;
@@ -68,12 +68,12 @@ public class PomodoroSessionEntity {
         this.mode = mode;
     }
 
-    public TaskEntity getTaskId() {
-        return taskId;
+    public TaskEntity getTask() {
+        return task;
     }
 
-    public void setTaskId(TaskEntity taskId) {
-        this.taskId = taskId;
+    public void setTask(TaskEntity task) {
+        this.task = task;
     }
 
     public Instant getStartedAt() {
