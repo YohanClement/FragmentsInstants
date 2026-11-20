@@ -68,7 +68,21 @@ must be aligned with the backend DTOs when those are written. Checked with
 `frontend/`; it now has (npm blocks the install scripts of esbuild/lmdb/@parcel/watcher/
 msgpackr-extract by default: if `ng serve`/`ng build` fails on one of them, see
 `npm install-scripts approve`; don't run `npm audit fix` blindly).
-**Resume at T022 (Angular routing shell)**.
+T022 is done: `app.routes.ts` declares 7 lazy routes (`loadComponent`) with tab `title`s; the
+dashboard lives at `/dashboard`, not `/` (user decision, deviation recorded in tasks.md): `/` and
+unknown URLs reach `/tasks` through the last route `{ path: '**', redirectTo: 'tasks' }` (there is
+no explicit `''` redirect). The 7 page components were generated empty (`ng generate component`)
+at the paths later tasks expect: `features/dashboard/dashboard-page`, `features/tasks/task-list`,
+`features/pomodoro/pomodoro-page`, `features/tags/tags-page`, `features/mood/mood-entry-page`,
+`features/charts/charts-page` (route `/stats`), `features/settings/settings-page`.
+`shared/components/app-shell` (selector renamed `app-shell`) holds `<nav>` with `routerLink`s and
+`<main><router-outlet/></main>`; `App` only renders `<app-shell/>`. Testing lesson: `TestBed` does
+not read `app.config.ts`, so any spec rendering a `routerLink` needs `providers: [provideRouter([])]`
+(not in `imports`), else `NG0201 No provider for ActivatedRoute`. `app.spec.ts`'s demo `h1` test was
+replaced by "should render the shell". `npx ng test --watch=false`: 10 tests pass; `npx ng build` OK
+(note: `tsc` alone does not check templates, `ng build` does). Open: `RouterLinkActive` not used
+yet; menu label/title "Etiquettes" lacks its accent.
+**Resume at T023 (palette CSS custom properties in `styles.scss`)**.
 
 Open points to revisit (not blockers):
 - `PomodoroSessionEntity` (T009): FR-012 says `actualDurationSeconds` must be server-computed with
