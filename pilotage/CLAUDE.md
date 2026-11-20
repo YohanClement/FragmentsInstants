@@ -47,7 +47,12 @@ revive them only when a service needs one. `SettingsEntity` has no all-args cons
 `open-in-view: false`, `flyway.locations`, springdoc paths, and a custom property
 `fragments-instants.cors.origine-frontend` (Spring has no standard MVC CORS property) that T020
 `CorsConfig` must read instead of hardcoding the origin; `backend/data/.gitkeep` keeps the folder.
-**Resume at T019 (error handling)**, then T020 (`CorsConfig`).
+T019 is done: `application/BusinessRuleException` (unchecked, message only) and
+`infrastructure/web/GlobalExceptionHandler` mapping it to 422 with the `BusinessRuleErrorResponse`
+record; it uses `HttpStatus.UNPROCESSABLE_CONTENT` (`UNPROCESSABLE_ENTITY` is deprecated in Spring 7)
+and does not extend `ResponseEntityExceptionHandler`, so 400 validation errors keep Spring's default
+body. Not exercised by a test yet: check it with the first controller that throws it (tags, T061+).
+**Resume at T020 (`CorsConfig`)**.
 
 Open points to revisit (not blockers):
 - `PomodoroSessionEntity` (T009): FR-012 says `actualDurationSeconds` must be server-computed with
