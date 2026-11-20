@@ -27,10 +27,11 @@ complete; implementation is done **manually by the user, task by task** — not 
 read them before answering questions about the design.
 
 **Precedence rule (user decision, 2026-11-20)**: the client's brief
-`pilotage/Les_Fragments_d_Instants_Cahier_des_Charges.pdf` (in French) ranks **above** every Spec Kit
-artifact (spec, plan, data-model, contracts, tasks). On a conflict, the brief wins: point the conflict
-out to the user and propose updating the spec, never resolve it silently. Exception: what the brief
-itself classifies as V2/V3 stays out of V1 (constitution VII).
+`pilotage/Les_Fragments_d_Instants_Cahier_des_Charges.pdf` (in French) is at the top. Order, written
+in the constitution's Governance section since 1.1.0: 1) the brief, 2) the constitution, 3) the Spec
+Kit artifacts (spec, plan, data-model, contracts, tasks). On a conflict, the higher document wins:
+point the conflict out to the user and propose updating the lower one, never resolve it silently.
+Exception: what the brief itself classifies as V2/V3 stays out of V1 (constitution VII).
 
 Spec Kit artifacts:
 
@@ -196,8 +197,10 @@ every implementation decision:
   `{ "code": "REGLE_METIER_VIOLEE", "message": string }` — never a per-rule code.
 - **Gestion des données manquantes**: a day with no entry is never treated as `0` in an average; a
   zero denominator (no tasks planned, no time recorded) always renders `0%`, never an error.
-- **Direction artistique**: dark, botanical palette — `#DF73FF`, `#B08D57`, `#4B2142`, `#234236`,
-  `#F2E8D5` — as CSS custom properties, AA contrast required, no red token.
+- **Direction artistique** (constitution 1.1.0): dark, botanical palette named after the brief —
+  Héliotrope `#DF73FF`, Doré ancien `#B08D57`, Prune `#4B2142`, Vert forêt `#234236`, Ivoire
+  `#F2E8D5` — plus a main background "almost black or very dark prune", Nuit `#1A053B`; as CSS
+  custom properties (`frontend/src/styles.scss`), AA contrast required, no red token.
 
 Pomodoro timing is timestamp-based on the frontend (never an incrementing counter, so it survives
 OS sleep/wake); only finished/interrupted sessions are POSTed to the backend, which recomputes the

@@ -1,21 +1,3 @@
-<!--
-Sync Impact Report
-- Version change: (none) → 1.0.0 (initial ratification)
-- Modified principles: N/A (initial adoption)
-- Added principles:
-  - I. Bienveillance
-  - II. Local-first
-  - III. Données brutes d'abord
-  - IV. Exactitude des calculs
-  - V. Gestion des données manquantes
-  - VI. Direction artistique
-  - VII. Simplicité
-- Added sections: Governance
-- Removed sections: none
-- Templates requiring updates: not checked in this run (no dependent templates reviewed)
-- Deferred TODOs: none
--->
-
 # Les Fragments d'Instants Constitution
 
 ## Core Principles
@@ -59,9 +41,18 @@ fausserait les statistiques affichées à l'utilisateur.
 
 ### VI. Direction artistique
 L'application adopte un mode sombre à l'esthétique botanique et féerique. La palette de couleurs
-imposée est : #DF73FF, #B08D57, #4B2142, #234236, #F2E8D5. Tous les textes DOIVENT respecter un
-niveau de contraste AA pour rester lisibles.
-Rationale : assure une identité visuelle cohérente et un niveau d'accessibilité minimal garanti.
+imposée, avec les noms et rôles fixés par le cahier des charges, est :
+- Héliotrope #DF73FF : accent principal ;
+- Doré ancien #B08D57 : détails, bordures et éléments importants ;
+- Prune #4B2142 : panneaux et fonds secondaires ;
+- Vert forêt #234236 : bien-être, nature et couleur secondaire ;
+- Ivoire #F2E8D5 : texte clair et éléments lumineux.
+
+Le fond principal de l'interface DOIT être presque noir ou prune très foncé ; la valeur retenue
+est Nuit #1A053B. Tous les textes DOIVENT respecter un niveau de contraste AA pour rester
+lisibles, et aucune couleur rouge alarmante NE DOIT être ajoutée à la palette (principe I).
+Rationale : assure une identité visuelle cohérente, fidèle au cahier des charges de la
+commanditaire, et un niveau d'accessibilité minimal garanti.
 
 ### VII. Simplicité
 Le développement DOIT prioriser la livraison complète de la V1 avant toute considération de
@@ -71,9 +62,20 @@ est livré avant d'étendre la portée du projet.
 
 ## Governance
 
-Cette constitution prévaut sur toute autre pratique ou convention du projet. Toute décision de
-conception ou d'implémentation en contradiction avec un principe ci-dessus DOIT être explicitement
-justifiée ou révisée.
+Les documents du projet sont hiérarchisés ainsi, du plus prioritaire au moins prioritaire :
+1. le cahier des charges de la commanditaire
+   (`pilotage/Les_Fragments_d_Instants_Cahier_des_Charges.pdf`) ;
+2. cette constitution ;
+3. les spécifications (`spec.md`, `plan.md`, `data-model.md`, contrats, `tasks.md`).
+
+En cas de conflit, le document le plus prioritaire l'emporte. Tout conflit détecté DOIT être
+signalé, et le document le moins prioritaire DOIT être mis à jour pour s'aligner ; un conflit NE
+DOIT JAMAIS être tranché en silence. Exception : ce que le cahier des charges classe lui-même en
+V2 ou V3 reste hors de la V1 (principe VII).
+
+Cette constitution prévaut sur toute autre pratique ou convention du projet qui n'est pas listée
+ci-dessus. Toute décision de conception ou d'implémentation en contradiction avec un principe
+ci-dessus DOIT être explicitement justifiée ou révisée.
 
 Toute modification de cette constitution (ajout, suppression ou reformulation d'un principe)
 DOIT être documentée dans un Sync Impact Report en tête de ce fichier et DOIT suivre le
@@ -85,4 +87,4 @@ versionnage sémantique suivant :
 
 Chaque revue de code ou de conception DOIT vérifier la conformité aux principes ci-dessus.
 
-**Version**: 1.0.0 | **Ratified**: 2026-09-28 | **Last Amended**: 2026-09-28
+**Version**: 1.1.0 | **Ratified**: 2026-09-28 | **Last Amended**: 2026-11-20
