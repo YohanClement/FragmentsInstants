@@ -52,7 +52,12 @@ T019 is done: `application/BusinessRuleException` (unchecked, message only) and
 record; it uses `HttpStatus.UNPROCESSABLE_CONTENT` (`UNPROCESSABLE_ENTITY` is deprecated in Spring 7)
 and does not extend `ResponseEntityExceptionHandler`, so 400 validation errors keep Spring's default
 body. Not exercised by a test yet: check it with the first controller that throws it (tags, T061+).
-**Resume at T020 (`CorsConfig`)**.
+T020 is done: `infrastructure/web/CorsConfig` (`WebMvcConfigurer`) maps `/api/**` to the origin
+read from `fragments-instants.cors.origine-frontend`, with `allowedMethods("GET","PUT","POST","DELETE")`
+(Spring's default is only GET/HEAD/POST; the contract needs PUT and DELETE). No automated test:
+`@DataJpaTest` does not load the web layer. Checked manually on the running app with `curl.exe -X OPTIONS`
+preflights: origin `localhost:4200` → 200 with the Allow-Origin/Allow-Methods headers, another origin → 403.
+**Resume at T021 (frontend TypeScript models)**.
 
 Open points to revisit (not blockers):
 - `PomodoroSessionEntity` (T009): FR-012 says `actualDurationSeconds` must be server-computed with
