@@ -57,7 +57,18 @@ read from `fragments-instants.cors.origine-frontend`, with `allowedMethods("GET"
 (Spring's default is only GET/HEAD/POST; the contract needs PUT and DELETE). No automated test:
 `@DataJpaTest` does not load the web layer. Checked manually on the running app with `curl.exe -X OPTIONS`
 preflights: origin `localhost:4200` → 200 with the Allow-Origin/Allow-Methods headers, another origin → 403.
-**Resume at T021 (frontend TypeScript models)**.
+T021 is done: `frontend/src/app/core/models/` holds `tag`, `task`, `pomodoro-session`, `mood-entry`,
+`settings`, `dashboard`, `stats` and `api-error` (the 8th file, for the `REGLE_METIER_VIOLEE` body)
+`.model.ts`. Conventions used: enums as string-literal unions; separate response and `…Request`
+interfaces (requests omit server-owned fields such as `id`, `status`, `actualDurationSeconds`);
+`| null` only where the backend really sends null (never on counts/lists, per the constitution).
+JSON field names follow the contract where it names them, otherwise they are the user's choice and
+must be aligned with the backend DTOs when those are written. Checked with
+`npx tsc --noEmit -p tsconfig.app.json` (no output = OK). `npm install` had never been run in
+`frontend/`; it now has (npm blocks the install scripts of esbuild/lmdb/@parcel/watcher/
+msgpackr-extract by default: if `ng serve`/`ng build` fails on one of them, see
+`npm install-scripts approve`; don't run `npm audit fix` blindly).
+**Resume at T022 (Angular routing shell)**.
 
 Open points to revisit (not blockers):
 - `PomodoroSessionEntity` (T009): FR-012 says `actualDurationSeconds` must be server-computed with
@@ -76,6 +87,22 @@ Open points to revisit (not blockers):
   files (disconnect DBeaver first). Real changes go in a new `V4__…` migration.
 - The spike files (`V0__spike.sql`, `SpikeItem`, `SpikeItemRepository`, `SpikeRepositoryTest`) can
   now be deleted, since T005–T017 have landed; the test DB name `spike-test.db` can be renamed then.
+- FR-018 extremes-explanation text (decided 2026-11-20: keep option A for now). The contract makes
+  `GET /mood-entries/today` return an envelope `{ entry: MoodEntry | null, <explanation text> }`
+  (front model `TodayMoodResponse`, T021; back DTO T070). Option B, preferred on reflection: the
+  text is static UI wording, so it could live in the Angular mood component, and the endpoint
+  would return `MoodEntry | null` directly. Reminder: the text must differ per scale (mood 7 = good,
+  fatigue 7 = very tired). Revisit before T070; if B, update `contracts/api-overview.md`, T070, the
+  front mood component task, and `TodayMoodResponse`.
+- Tag breakdown (`GET /stats/tag-breakdown`): the front model `TagShare` (T021) carries a
+  `durationMinutes` field in addition to the percentage, kept by choice for tooltips. This is an
+  addition to `contracts/api-overview.md` (which only promises percentages): add it to the contract
+  and to the backend stats DTO when building that endpoint. The percentage still comes from the
+  backend (`TagPercentageBreakdown`), never recomputed in the front.
+- `PUT /tasks/{id}` semantics: the front `TaskRequest` (T021) uses `field?: T | null`, so absent
+  ("leave unchanged") and `null` ("clear it") are distinguishable. Decide which one the backend
+  implements (full replace vs partial update) when writing the task controller/service, and align
+  both sides.
 
 **Current state** (as of 2026-11-15, see "Where we stopped" above for later progress; `tasks.md`
 checkboxes are the source of truth):
