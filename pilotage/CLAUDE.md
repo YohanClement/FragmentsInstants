@@ -24,7 +24,15 @@ donc signale-moi ce qui a changé), débutant en Angular et TypeScript.
 This repo is a [GitHub Spec Kit](https://github.com/github/spec-kit) project. Planning is
 complete; implementation is done **manually by the user, task by task** — not by the agent. The
 **authoritative design docs live under `pilotage/specs/001-taches-pomodoro-humeur/`**, not in this file —
-read them before answering questions about the design:
+read them before answering questions about the design.
+
+**Precedence rule (user decision, 2026-11-20)**: the client's brief
+`pilotage/Les_Fragments_d_Instants_Cahier_des_Charges.pdf` (in French) ranks **above** every Spec Kit
+artifact (spec, plan, data-model, contracts, tasks). On a conflict, the brief wins: point the conflict
+out to the user and propose updating the spec, never resolve it silently. Exception: what the brief
+itself classifies as V2/V3 stays out of V1 (constitution VII).
+
+Spec Kit artifacts:
 
 - `spec.md` — feature spec: user stories (US1-US8, all Priority P1), functional requirements
   (FR-001..FR-040), success criteria, clarifications, edge cases.
@@ -113,6 +121,16 @@ Open points to revisit (not blockers):
   addition to `contracts/api-overview.md` (which only promises percentages): add it to the contract
   and to the backend stats DTO when building that endpoint. The percentage still comes from the
   backend (`TagPercentageBreakdown`), never recomputed in the front.
+- Palette (T023, in progress): the brief (page 2, "Direction artistique") names the colors
+  Héliotrope `#DF73FF` (main accent), Doré ancien `#B08D57` (details, borders, important elements),
+  Prune `#4B2142` (panels, secondary backgrounds), Vert forêt `#234236` (well-being, nature,
+  secondary), Ivoire `#F2E8D5` (light text), and asks for a main background that is "almost black
+  or very dark prune" (a 6th color, not in the constitution's list). The user is renaming the
+  tokens in `styles.scss` after the brief's vocabulary; once done, update the T023 text in
+  tasks.md (its English names `--color-accent/bronze/plum/forest/parchment` become obsolete) and
+  the constitution's palette list if needed. Other brief-vs-spec gaps noticed, not yet reviewed:
+  side navigation with a "Bilan hebdo" entry, weekly synthesis (section 12), a quote on the
+  dashboard.
 - `PUT /tasks/{id}` semantics: the front `TaskRequest` (T021) uses `field?: T | null`, so absent
   ("leave unchanged") and `null` ("clear it") are distinguishable. Decide which one the backend
   implements (full replace vs partial update) when writing the task controller/service, and align

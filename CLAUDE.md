@@ -28,3 +28,9 @@ donc signale-moi ce qui a changé), débutant en Angular et TypeScript.
   (je le suis dans l'ordre, tâche par tâche).
 - Conception : `spec.md`, `plan.md` et `data-model.md` dans le même dossier.
 - Principes du projet : `pilotage/.specify/memory/constitution.md`.
+- Document de référence : `pilotage/Les_Fragments_d_Instants_Cahier_des_Charges.pdf`, le cahier
+  des charges fourni par la commanditaire. **En cas de conflit entre ce cahier des charges et les
+  spécifications (`spec.md`, `plan.md`, `data-model.md`, `tasks.md`, contrats), le cahier des
+  charges prime.** Quand tu détectes un conflit, signale-le-moi et propose de mettre à jour la
+  spécification ; ne tranche pas en silence. Seule exception : ce que le cahier des charges classe
+  lui-même en V2 ou V3 reste hors de la V1.
