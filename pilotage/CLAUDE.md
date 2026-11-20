@@ -90,7 +90,17 @@ not read `app.config.ts`, so any spec rendering a `routerLink` needs `providers:
 replaced by "should render the shell". `npx ng test --watch=false`: 10 tests pass; `npx ng build` OK
 (note: `tsc` alone does not check templates, `ng build` does). Open: `RouterLinkActive` not used
 yet; menu label/title "Etiquettes" lacks its accent.
-**Resume at T023 (palette CSS custom properties in `styles.scss`)**.
+T023 is done: `frontend/src/styles.scss` defines, on `:root`, the palette named after the brief
+(`--color-heliotrope`, `--color-dore-ancien`, `--color-prune`, `--color-vert-foret`, `--color-ivoire`,
+plus `--color-nuit: #1A053B` for the main background, a very dark violet chosen by the user) and role
+tokens that components must use instead of palette colors: `--color-bg` (nuit), `--color-surface`
+(prune, panels), `--color-text` (ivoire), `--color-link` (heliotrope), `--color-border` and
+`--color-focus` (doré ancien); `color-scheme: dark`; `body`, `a` and `:focus-visible` rules.
+Contrast on `#1A053B`: ivoire 15.3, héliotrope 7.1, doré ancien 6.0 (all pass AA for normal text);
+héliotrope on vert forêt is only 4.2, so never put normal-size links/text in héliotrope on a
+vert-forêt surface. Pitfall met: a `var()` pointing to a renamed/missing variable fails silently
+(the declaration is dropped, e.g. no focus ring at all).
+**Resume at T024 (backend `@SpringBootTest` smoke test)**.
 
 Open points to revisit (not blockers):
 - `PomodoroSessionEntity` (T009): FR-012 says `actualDurationSeconds` must be server-computed with
@@ -121,16 +131,10 @@ Open points to revisit (not blockers):
   addition to `contracts/api-overview.md` (which only promises percentages): add it to the contract
   and to the backend stats DTO when building that endpoint. The percentage still comes from the
   backend (`TagPercentageBreakdown`), never recomputed in the front.
-- Palette (T023, in progress): the brief (page 2, "Direction artistique") names the colors
-  Héliotrope `#DF73FF` (main accent), Doré ancien `#B08D57` (details, borders, important elements),
-  Prune `#4B2142` (panels, secondary backgrounds), Vert forêt `#234236` (well-being, nature,
-  secondary), Ivoire `#F2E8D5` (light text), and asks for a main background that is "almost black
-  or very dark prune" (a 6th color, not in the constitution's list). The user is renaming the
-  tokens in `styles.scss` after the brief's vocabulary; once done, update the T023 text in
-  tasks.md (its English names `--color-accent/bronze/plum/forest/parchment` become obsolete) and
-  the constitution's palette list if needed. Other brief-vs-spec gaps noticed, not yet reviewed:
-  side navigation with a "Bilan hebdo" entry, weekly synthesis (section 12), a quote on the
-  dashboard.
+- Brief-vs-spec gaps noticed while doing T023, not yet reviewed (precedence rule applies): side
+  navigation with a "Bilan hebdo" entry (the app shell nav is currently a plain top `<nav>`),
+  weekly synthesis (brief section 12), a quote/short sentence on the dashboard. Palette roles from
+  the brief (page 2) are now applied in `styles.scss` (see T023 above).
 - `PUT /tasks/{id}` semantics: the front `TaskRequest` (T021) uses `field?: T | null`, so absent
   ("leave unchanged") and `null` ("clear it") are distinguishable. Decide which one the backend
   implements (full replace vs partial update) when writing the task controller/service, and align

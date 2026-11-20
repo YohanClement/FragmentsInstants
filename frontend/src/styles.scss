@@ -1,1 +1,32 @@
-/* You can add global styles to this file, and also import other style files */
+:root {
+  --color-heliotrope: #df73ff;
+  --color-dore-ancien: #b08d57;
+  --color-prune: #4b2142;
+  --color-vert-foret: #234236;
+  --color-ivoire: #f2e8d5;
+  --color-nuit: #1a053b;
+
+  --color-bg: var(--color-nuit);
+  --color-surface: var(--color-prune);
+  --color-text: var(--color-ivoire);
+  --color-border: var(--color-dore-ancien);
+  --color-link: var(--color-heliotrope);
+  --color-focus: var(--color-dore-ancien);
+
+  color-scheme: dark;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  margin: 0;
+  font-family: system-ui, sans-serif;
+}
+
+a {
+  color: var(--color-link);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-focus);
+}
