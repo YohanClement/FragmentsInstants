@@ -43,15 +43,16 @@ read them before answering questions about the design:
 (T013–T017) are done, each repository with a `@DataJpaTest` test; the full backend suite passes.
 `TaskRepository` keeps a few extra query methods commented out (not required by T013, untested);
 revive them only when a service needs one. `SettingsEntity` has no all-args constructor on purpose
-(single row seeded by `V3`, never created by the app). **Resume at T018 (`application.yml`)**, then
-T019 (error handling), T020 (`CorsConfig`).
+(single row seeded by `V3`, never created by the app). T018 is done: `application.yml` sets
+`open-in-view: false`, `flyway.locations`, springdoc paths, and a custom property
+`fragments-instants.cors.origine-frontend` (Spring has no standard MVC CORS property) that T020
+`CorsConfig` must read instead of hardcoding the origin; `backend/data/.gitkeep` keeps the folder.
+**Resume at T019 (error handling)**, then T020 (`CorsConfig`).
 
 Open points to revisit (not blockers):
 - `PomodoroSessionEntity` (T009): FR-012 says `actualDurationSeconds` must be server-computed with
   no public setter reachable from outside the entity/service layer. Not re-reviewed after the
   `Long`→`Integer` and `@ManyToOne` fixes; check it before the session service.
-- `backend/data/` no longer exists on a fresh clone (the `.db` is now gitignored): add
-  `backend/data/.gitkeep` or have the app create the folder (T018).
 - Validation ranges (`@Min`/`@Max`/`@Positive`) belong on the request DTOs, not on entities.
 - The root `README.md` still describes the Angular CLI commands; move it into `frontend/` or rewrite it.
 - Case-insensitive tag uniqueness does not cover accented letters under SQLite: `upper()` and
