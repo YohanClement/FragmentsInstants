@@ -101,7 +101,15 @@ Contrast on `#1A053B`: ivoire 15.3, héliotrope 7.1, doré ancien 6.0 (all pass 
 héliotrope on vert forêt is only 4.2, so never put normal-size links/text in héliotrope on a
 vert-forêt surface. Pitfall met: a `var()` pointing to a renamed/missing variable fails silently
 (the declaration is dropped, e.g. no focus ring at all).
-**Resume at T024 (backend `@SpringBootTest` smoke test)**.
+T024 is done: `FragmentsInstantsApplicationTests` (`@SpringBootTest`) now points at
+`target/smoke-test.db` and deletes it in a static `@BeforeAll` (`Files.deleteIfExists(Path.of(...))`,
+path relative to `backend/`, no leading `/`), so Flyway applies all 4 migrations from scratch on every
+run (log: "Successfully applied 4 migrations"; "Schema is up to date" would mean the delete failed).
+It checks: context loads, 8 tags with `Autre` protected, 1 settings row with the V3 defaults
+(`BigDecimal` compared with `isEqualByComparingTo`, never `isEqualTo`). Before T024 the generated
+`contextLoads()` ran Flyway against the real `data/fragments-instants.db`; no test uses it anymore.
+Full backend suite: 24 tests pass. **Phase 2 (Foundational) is complete.**
+**Resume at T025 (Phase 3, US1: `TaskControllerTest` contract tests, written before the controller)**.
 
 Open points to revisit (not blockers):
 - `PomodoroSessionEntity` (T009): FR-012 says `actualDurationSeconds` must be server-computed with
