@@ -119,24 +119,5 @@ public class SettingsEntity {
         this.soundNotificationsEnabled = soundNotificationsEnabled;
     }
 
-    public SettingsEntity() {
-    }
-
-    public SettingsEntity(Integer focusDurationMinutes, Integer shortBreakDurationMinutes,
-            Integer longBreakDurationMinutes, Integer pomodorosBeforeLongBreak, BigDecimal priorityCoefficientLow,
-            BigDecimal priorityCoefficientNormal, BigDecimal priorityCoefficientHigh, BigDecimal priorityCoefficientCritical,
-            Boolean soundNotificationsEnabled) {
-        this.focusDurationMinutes = focusDurationMinutes;
-        this.shortBreakDurationMinutes = shortBreakDurationMinutes;
-        this.longBreakDurationMinutes = longBreakDurationMinutes;
-        this.pomodorosBeforeLongBreak = pomodorosBeforeLongBreak;
-        this.priorityCoefficientLow = priorityCoefficientLow;
-        this.priorityCoefficientNormal = priorityCoefficientNormal;
-        this.priorityCoefficientHigh = priorityCoefficientHigh;
-        this.priorityCoefficientCritical = priorityCoefficientCritical;
-        this.soundNotificationsEnabled = soundNotificationsEnabled;
-    }
-
-    
-    
+    protected SettingsEntity() {}        
 }

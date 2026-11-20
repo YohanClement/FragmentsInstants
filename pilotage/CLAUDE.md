@@ -39,11 +39,12 @@ read them before answering questions about the design:
   of truth for "what to build next."** The user works through it manually, in order; don't
   reorder phases without checking the Dependencies section first.
 
-**Where we stopped (2026-11-17)**: all JPA entities are written (T008–T012); T015
-`TagRepository` and T013 `TaskRepository` are done with `@DataJpaTest` tests (16 backend tests
-pass). `TaskRepository` keeps a few extra query methods commented out (not required by T013,
-untested); revive them only when a service needs one. **Resume at T014
-`PomodoroSessionRepository`**, then T016, T017, then T018 (`application.yml`) and T019 (error handling).
+**Where we stopped (2026-11-20)**: all JPA entities (T008–T012) and all repositories
+(T013–T017) are done, each repository with a `@DataJpaTest` test; the full backend suite passes.
+`TaskRepository` keeps a few extra query methods commented out (not required by T013, untested);
+revive them only when a service needs one. `SettingsEntity` has no all-args constructor on purpose
+(single row seeded by `V3`, never created by the app). **Resume at T018 (`application.yml`)**, then
+T019 (error handling), T020 (`CorsConfig`).
 
 Open points to revisit (not blockers):
 - `PomodoroSessionEntity` (T009): FR-012 says `actualDurationSeconds` must be server-computed with
@@ -58,10 +59,15 @@ Open points to revisit (not blockers):
   (documented by `TagRepositoryTest`). Handle it in the tag service (e.g. Java
   `equalsIgnoreCase`) in T061 `TagService`, with a case in T059.
 - SQLite stores `NUMERIC(4,2)` as a float; `BigDecimal` stays the Java type for exact calculations.
-- Editing `V1` changes its Flyway checksum: delete `backend/data/fragments-instants.db` (and
-  disconnect DBeaver first) if a migration is edited after being applied.
+- Never edit an applied migration, even for whitespace: Flyway checksums the file text and refuses
+  to start (`Migration checksum mismatch`), in tests (`target/spike-test.db`) and in the app
+  (`backend/data/fragments-instants.db`). Revert the edit (`git restore`), or delete both `.db`
+  files (disconnect DBeaver first). Real changes go in a new `V4__…` migration.
+- The spike files (`V0__spike.sql`, `SpikeItem`, `SpikeItemRepository`, `SpikeRepositoryTest`) can
+  now be deleted, since T005–T017 have landed; the test DB name `spike-test.db` can be renamed then.
 
-**Current state** (as of 2026-11-15; `tasks.md` checkboxes are the source of truth):
+**Current state** (as of 2026-11-15, see "Where we stopped" above for later progress; `tasks.md`
+checkboxes are the source of truth):
 
 - Done: **T001** (feasibility spike — SQLite + Flyway + Hibernate with `Long`/`IDENTITY` ids
   validated, 9 backend tests pass), **T002** (chart dependencies), **T003** (Angular environment
